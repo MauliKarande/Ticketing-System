@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Ameya Tech Support</title>
+</head>
+<body>
+
+<!-- Navbar -->
+<div style="padding:10px; background:#f0f0f0; border-bottom:1px solid #ccc;">
+    <b>Ameya Tech Support</b> |
+
+    User: {{ request.user.username }} |
+    Role: {{ request.user.role }} |
+    Dept: {{ request.user.department }}
+
+    &nbsp;&nbsp;|&nbsp;&nbsp;
+
+    <a href="/">Dashboard</a> |
+    <a href="/tickets/raise/">Raise Ticket</a> |
+    <a href="/logout/">Logout</a>
+</div>
+
+<hr>
+
+<!-- Page Content -->
+{% block content %}
+{% endblock %}
+
+</body>
+</html>

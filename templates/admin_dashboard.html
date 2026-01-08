@@ -1,54 +1,31 @@
+{% extends "base.html" %}
+
+{% block content %}
 <h2>Admin Dashboard - New Tickets</h2>
 
 <table border="1" cellpadding="8">
-    <tr>
-        <th>ID</th>
-        <th>Title</th>
-        <th>Issue Type</th>
-        <th>Raised By</th>
-        <th>Details</th>
-        <td>
-    {% if ticket.id %}
-    <a href="{% url 'ticket_details' ticket.id %}">View Details</a>
-{% else %}
-    Invalid Ticket
-{% endif %}
+<tr>
+    <th>ID</th>
+    <th>Title</th>
+    <th>Issue Type</th>
+    <th>Raised By</th>
+    <th>View</th>
+</tr>
 
-</td>
-
-    </tr>
-
-    {% for ticket in tickets %}
-    <tr>
-        <td>{{ ticket.id }}</td>
-        <td>{{ ticket.title }}</td>
-        <td>{{ ticket.issue_type }}</td>
-        <td>{{ ticket.raised_by.username }}</td>
-
-        <!-- Details button -->
-        <td>
-            <a href="{% url 'ticket_details' ticket.id %}">View</a>
-        </td>
-
-        <!-- Actions -->
-        <td>
-            <a href="{% url 'admin_accept_ticket' ticket.id %}">Accept</a>
-            |
-            <form method="post"
-                  action="{% url 'admin_reject_ticket' ticket.id %}"
-                  style="display:inline;">
-                {% csrf_token %}
-                <input type="text"
-                       name="rejection_reason"
-                       placeholder="Reason"
-                       required>
-                <button type="submit">Reject</button>
-            </form>
-        </td>
-    </tr>
-    {% empty %}
-    <tr>
-        <td colspan="6">No new tickets</td>
-    </tr>
-    {% endfor %}
+{% for ticket in tickets %}
+<tr>
+    <td>{{ ticket.id }}</td>
+    <td>{{ ticket.title }}</td>
+    <td>{{ ticket.issue_type }}</td>
+    <td>{{ ticket.raised_by.username }}</td>
+    <td>
+        <a href="{% url 'ticket_details' ticket.id %}">View</a>
+    </td>
+</tr>
+{% empty %}
+<tr>
+    <td colspan="5">No new tickets</td>
+</tr>
+{% endfor %}
 </table>
+{% endblock %}
