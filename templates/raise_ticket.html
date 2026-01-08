@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Raise IT Support Ticket</title>
+</head>
+<body>
+
+<h2>Raise IT Support Ticket</h2>
+
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+
+    <p>
+        <label><b>Title *</b></label><br>
+        {{ form.title }}
+    </p>
+
+    <p>
+        <label><b>Issue Type *</b></label><br>
+        {{ form.issue_type }}
+    </p>
+
+    <p>
+        <label><b>Description *</b></label><br>
+        {{ form.description }}
+    </p>
+
+    <p>
+        <label><b>Screenshot (optional)</b></label><br>
+        {{ form.attachment }}
+    </p>
+
+    <br>
+    <button type="submit">Submit Ticket</button>
+</form>
+
+</body>
+</html>
