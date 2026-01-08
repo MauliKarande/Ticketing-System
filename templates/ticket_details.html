@@ -2,8 +2,6 @@
 
 {% block content %}
 
-
-
 <h2>Ticket Details</h2>
 
 <table border="1" cellpadding="8">
@@ -80,30 +78,17 @@
 
 <br>
 
-<a href="/tickets/admin/dashboard/">⬅ Back to Admin Dashboard</a>
-{% if ticket.approval_status == 'PENDING_HOD' and user.role in 'HOD MANAGER' %}
-<tr>
-    <th>Approval Action</th>
-    <td>
-        <a href="{% url 'approve_ticket' ticket.id %}">Approve</a>
+<a href="/">⬅ Back to Dashboard</a>
 
-        <form method="post"
-              action="{% url 'reject_ticket' ticket.id %}"
-              style="display:inline;">
-            {% csrf_token %}
-            <button type="submit">Reject</button>
-        </form>
-    </td>
-</tr>
-{% endif %}
-
-{% if user.role == 'ADMIN' and ticket.status == 'NEW' %}
 <hr>
 
+{# ================= ADMIN ACTIONS ================= #}
+
+{% if user.role == 'ADMIN' and ticket.status == 'NEW' %}
 <h3>Admin Actions</h3>
 
 <a href="{% url 'admin_accept_ticket' ticket.id %}">
-    ✅ Accept & Start Work
+    Accept & Start Work
 </a>
 
 <br><br>
@@ -114,8 +99,41 @@
            name="rejection_reason"
            placeholder="Reason for rejection"
            required>
-    <button type="submit">❌ Reject Ticket</button>
+    <button type="submit">Reject Ticket</button>
 </form>
+{% endif %}
+
+
+{% if user.role == 'ADMIN' and ticket.status == 'IN_PROGRESS' %}
+<hr>
+<h3>Admin Close Ticket</h3>
+
+<form method="post" action="{% url 'admin_close_ticket' ticket.id %}">
+    {% csrf_token %}
+    <textarea name="admin_close_comment"
+              placeholder="Work done / resolution details"
+              required></textarea>
+    <br>
+    <button type="submit">Close Ticket (Admin)</button>
+</form>
+{% endif %}
+
+{# ================= HOD / MANAGER FINAL CLOSE ================= #}
+
+{% if ticket.status == 'RESOLVED_BY_ADMIN' %}
+    {% if user.role == 'HOD' or user.role == 'MANAGER' %}
+    <hr>
+    <h3>Final Closure (HOD / Manager)</h3>
+
+    <form method="post" action="{% url 'final_close_ticket' ticket.id %}">
+        {% csrf_token %}
+        <textarea name="final_close_comment"
+                  placeholder="Final confirmation / remarks"
+                  required></textarea>
+        <br>
+        <button type="submit">Final Close Ticket</button>
+    </form>
+    {% endif %}
 {% endif %}
 
 {% endblock %}
