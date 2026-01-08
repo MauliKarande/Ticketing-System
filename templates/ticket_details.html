@@ -1,0 +1,92 @@
+<h2>Ticket Details</h2>
+
+<table border="1" cellpadding="8">
+    <tr>
+        <th>Ticket ID</th>
+        <td>{{ ticket.id }}</td>
+    </tr>
+
+    <tr>
+        <th>Title</th>
+        <td>{{ ticket.title }}</td>
+    </tr>
+
+    <tr>
+        <th>Issue Type</th>
+        <td>{{ ticket.issue_type }}</td>
+    </tr>
+
+    <tr>
+        <th>Raised By</th>
+        <td>{{ ticket.raised_by.username }}</td>
+    </tr>
+
+    <tr>
+        <th>Department</th>
+        <td>{{ ticket.department }}</td>
+    </tr>
+
+    <tr>
+        <th>Raised On</th>
+        <td>{{ ticket.created_at }}</td>
+    </tr>
+
+    <tr>
+        <th>Status</th>
+        <td>{{ ticket.status }}</td>
+    </tr>
+
+    <tr>
+        <th>Approval Status</th>
+        <td>{{ ticket.approval_status }}</td>
+    </tr>
+
+    <tr>
+        <th>Description</th>
+        <td>{{ ticket.description }}</td>
+    </tr>
+
+    <tr>
+        <th>Issue Image</th>
+        <td>
+            {% if ticket.attachment %}
+                <img src="{{ ticket.attachment.url }}" width="400">
+            {% else %}
+                No image uploaded
+            {% endif %}
+        </td>
+    </tr>
+
+    {% if ticket.admin_comment %}
+    <tr>
+        <th>Admin Comment</th>
+        <td>{{ ticket.admin_comment }}</td>
+    </tr>
+    {% endif %}
+
+    {% if ticket.rejection_reason %}
+    <tr>
+        <th>Rejection Reason</th>
+        <td>{{ ticket.rejection_reason }}</td>
+    </tr>
+    {% endif %}
+</table>
+
+<br>
+
+<a href="/tickets/admin/dashboard/">⬅ Back to Admin Dashboard</a>
+{% if ticket.approval_status == 'PENDING_HOD' and user.role in 'HOD MANAGER' %}
+<tr>
+    <th>Approval Action</th>
+    <td>
+        <a href="{% url 'approve_ticket' ticket.id %}">Approve</a>
+
+        <form method="post"
+              action="{% url 'reject_ticket' ticket.id %}"
+              style="display:inline;">
+            {% csrf_token %}
+            <button type="submit">Reject</button>
+        </form>
+    </td>
+</tr>
+{% endif %}

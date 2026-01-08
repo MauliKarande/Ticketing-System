@@ -80,3 +80,52 @@ def raise_ticket(request):
         form = TicketCreateForm()
 
     return render(request, 'raise_ticket.html', {'form': form})
+
+
+@login_required
+def ticket_details(request, ticket_id):
+    ticket = get_object_or_404(Ticket, id=ticket_id)
+
+    # Only Admin can view full ticket details for now
+    if request.user.role != 'ADMIN':
+        return redirect('/')
+
+    return render(request, 'ticket_details.html', {
+        'ticket': ticket
+    })
+@login_required
+def approve_ticket(request, ticket_id):
+    ticket = get_object_or_404(Ticket, id=ticket_id)
+
+    # Only HOD or Manager can approve
+    if request.user.role not in ['HOD', 'MANAGER']:
+        return redirect('/')
+
+    # Approval only if pending
+    if ticket.approval_status != 'PENDING_HOD':
+        return redirect('/')
+
+    ticket.approval_status = 'APPROVED'
+    ticket.approved_by = request.user
+    ticket.save()
+
+    return redirect(f'/tickets/details/{ticket.id}/')
+
+
+@login_required
+def reject_ticket(request, ticket_id):
+    ticket = get_object_or_404(Ticket, id=ticket_id)
+
+    # Only HOD or Manager can reject
+    if request.user.role not in ['HOD', 'MANAGER']:
+        return redirect('/')
+
+    if ticket.approval_status != 'PENDING_HOD':
+        return redirect('/')
+
+    if request.method == 'POST':
+        ticket.approval_status = 'REJECTED'
+        ticket.approved_by = request.user
+        ticket.save()
+
+    return redirect(f'/tickets/details/{ticket.id}/')

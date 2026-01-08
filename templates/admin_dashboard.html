@@ -6,6 +6,7 @@
         <th>Title</th>
         <th>Issue Type</th>
         <th>Raised By</th>
+        <th>Details</th>
         <th>Actions</th>
     </tr>
 
@@ -15,19 +16,31 @@
         <td>{{ ticket.title }}</td>
         <td>{{ ticket.issue_type }}</td>
         <td>{{ ticket.raised_by.username }}</td>
+
+        <!-- Details button -->
+        <td>
+            <a href="{% url 'ticket_details' ticket.id %}">View</a>
+        </td>
+
+        <!-- Actions -->
         <td>
             <a href="{% url 'admin_accept_ticket' ticket.id %}">Accept</a>
             |
-            <form method="post" action="{% url 'admin_reject_ticket' ticket.id %}" style="display:inline;">
+            <form method="post"
+                  action="{% url 'admin_reject_ticket' ticket.id %}"
+                  style="display:inline;">
                 {% csrf_token %}
-                <input type="text" name="rejection_reason" placeholder="Reason" required>
+                <input type="text"
+                       name="rejection_reason"
+                       placeholder="Reason"
+                       required>
                 <button type="submit">Reject</button>
             </form>
         </td>
     </tr>
     {% empty %}
     <tr>
-        <td colspan="5">No new tickets</td>
+        <td colspan="6">No new tickets</td>
     </tr>
     {% endfor %}
 </table>
