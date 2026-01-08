@@ -1,11 +1,17 @@
+admin:
 Username: ameya
 Email address: it@ameyaengineers.com
 Password:123
 
+emp:
 quality
 Ameya@123
 
+emp:
 quality_hod
 Ameya@123
 
-manager@123
+manager:
+
+manager
+Ameya@123

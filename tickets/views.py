@@ -5,6 +5,8 @@ from django.utils import timezone
 from .models import Ticket
 from .forms import TicketCreateForm
 
+from django.contrib.auth import authenticate, login, logout
+
 
 
 @login_required
@@ -164,3 +166,32 @@ def manager_dashboard(request):
     return render(request, 'manager_dashboard.html', {
         'tickets': tickets
     })
+
+
+
+
+
+def login_view(request):
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+
+        user = authenticate(request, username=username, password=password)
+
+        if user is not None:
+            login(request, user)
+            return redirect('/')
+        else:
+            return render(request, 'login.html', {
+                'error': 'Invalid username or password'
+            })
+
+    return render(request, 'login.html')
+
+    
+@login_required
+def logout_view(request):
+    logout(request)
+    return redirect('/login/')
+
+

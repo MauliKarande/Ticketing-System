@@ -4,10 +4,13 @@ from django.shortcuts import redirect
 from django.conf import settings
 from django.conf.urls.static import static
 
+from tickets.views import login_view, logout_view
+
+
 
 def home(request):
     if not request.user.is_authenticated:
-        return redirect('/admin/login/')
+        return redirect('/login/')
 
     if request.user.role == 'ADMIN':
         return redirect('/tickets/admin/dashboard/')
@@ -18,11 +21,14 @@ def home(request):
     elif request.user.role == 'MANAGER':
         return redirect('/tickets/manager/dashboard/')
 
-    return redirect('/admin/login/')
+    return redirect('/login/')
+
 
 
 urlpatterns = [
-    path('', home),   # 👈 THIS FIXES 404
+    path('', home),
+    path('login/', login_view, name='login'),
+    path('logout/', logout_view, name='logout'),
     path('admin/', admin.site.urls),
     path('tickets/', include('tickets.urls')),
 ]

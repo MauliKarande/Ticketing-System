@@ -1,4 +1,4 @@
-<h2>All Tickets (Manager View)</h2>
+<h2>All Tickets (Manager Dashboard)</h2>
 
 <table border="1" cellpadding="8">
 <tr>
@@ -16,7 +16,11 @@
     <td>{{ ticket.department }}</td>
     <td>{{ ticket.status }}</td>
     <td>
-        <a href="{% url 'ticket_details' ticket.id %}">View</a>
+        {% if ticket.id %}
+            <a href="{% url 'ticket_details' ticket.id %}">View</a>
+        {% else %}
+            N/A
+        {% endif %}
     </td>
 </tr>
 {% empty %}
@@ -25,3 +29,6 @@
 </tr>
 {% endfor %}
 </table>
+
+<br>
+<a href="/logout/">Logout</a>
