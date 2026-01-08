@@ -84,17 +84,40 @@ def raise_ticket(request):
     return render(request, 'raise_ticket.html', {'form': form})
 
 
+
 @login_required
 def ticket_details(request, ticket_id):
     ticket = get_object_or_404(Ticket, id=ticket_id)
 
-    # Only Admin can view full ticket details for now
-    if request.user.role != 'ADMIN':
+    # ADMIN can view everything
+    if request.user.role == 'ADMIN':
+        pass
+
+    # MANAGER can view all tickets (read-only)
+    elif request.user.role == 'MANAGER':
+        pass
+
+    # HOD can view department tickets
+    elif request.user.role == 'HOD':
+        if ticket.department != request.user.department:
+            return redirect('/')
+
+    # EMPLOYEE can view only own tickets
+    elif request.user.role == 'EMPLOYEE':
+        if ticket.raised_by != request.user:
+            return redirect('/')
+
+    else:
         return redirect('/')
 
     return render(request, 'ticket_details.html', {
         'ticket': ticket
     })
+
+
+
+
+
 @login_required
 def approve_ticket(request, ticket_id):
     ticket = get_object_or_404(Ticket, id=ticket_id)
@@ -188,7 +211,7 @@ def login_view(request):
 
     return render(request, 'login.html')
 
-    
+
 @login_required
 def logout_view(request):
     logout(request)
