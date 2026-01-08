@@ -9,5 +9,9 @@ urlpatterns = [
     path('details/<int:ticket_id>/', views.ticket_details, name='ticket_details'),
     path('approve/<int:ticket_id>/', views.approve_ticket, name='approve_ticket'),
     path('reject/<int:ticket_id>/', views.reject_ticket, name='reject_ticket'),
+    path('employee/dashboard/', views.employee_dashboard, name='employee_dashboard'),
+    path('hod/dashboard/', views.hod_dashboard, name='hod_dashboard'),
+    path('manager/dashboard/', views.manager_dashboard, name='manager_dashboard'),
+
 
 ]

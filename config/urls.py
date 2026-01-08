@@ -6,11 +6,18 @@ from django.conf.urls.static import static
 
 
 def home(request):
-    if request.user.is_authenticated:
-        if request.user.role == 'ADMIN':
-            return redirect('/tickets/admin/dashboard/')
-        else:
-            return redirect('/tickets/raise/')
+    if not request.user.is_authenticated:
+        return redirect('/admin/login/')
+
+    if request.user.role == 'ADMIN':
+        return redirect('/tickets/admin/dashboard/')
+    elif request.user.role == 'EMPLOYEE':
+        return redirect('/tickets/employee/dashboard/')
+    elif request.user.role == 'HOD':
+        return redirect('/tickets/hod/dashboard/')
+    elif request.user.role == 'MANAGER':
+        return redirect('/tickets/manager/dashboard/')
+
     return redirect('/admin/login/')
 
 

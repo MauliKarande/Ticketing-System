@@ -129,3 +129,38 @@ def reject_ticket(request, ticket_id):
         ticket.save()
 
     return redirect(f'/tickets/details/{ticket.id}/')
+
+@login_required
+def employee_dashboard(request):
+    if request.user.role != 'EMPLOYEE':
+        return redirect('/')
+
+    tickets = Ticket.objects.filter(raised_by=request.user).order_by('-created_at')
+
+    return render(request, 'employee_dashboard.html', {
+        'tickets': tickets
+    })
+
+@login_required
+def hod_dashboard(request):
+    if request.user.role != 'HOD':
+        return redirect('/')
+
+    tickets = Ticket.objects.filter(
+        department=request.user.department
+    ).order_by('-created_at')
+
+    return render(request, 'hod_dashboard.html', {
+        'tickets': tickets
+    })
+
+@login_required
+def manager_dashboard(request):
+    if request.user.role != 'MANAGER':
+        return redirect('/')
+
+    tickets = Ticket.objects.all().order_by('-created_at')
+
+    return render(request, 'manager_dashboard.html', {
+        'tickets': tickets
+    })
