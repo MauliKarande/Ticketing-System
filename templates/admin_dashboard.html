@@ -7,7 +7,15 @@
         <th>Issue Type</th>
         <th>Raised By</th>
         <th>Details</th>
-        <th>Actions</th>
+        <td>
+    {% if ticket.id %}
+    <a href="{% url 'ticket_details' ticket.id %}">View Details</a>
+{% else %}
+    Invalid Ticket
+{% endif %}
+
+</td>
+
     </tr>
 
     {% for ticket in tickets %}

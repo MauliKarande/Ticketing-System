@@ -90,3 +90,25 @@
     </td>
 </tr>
 {% endif %}
+
+{% if user.role == 'ADMIN' and ticket.status == 'NEW' %}
+<hr>
+
+<h3>Admin Actions</h3>
+
+<a href="{% url 'admin_accept_ticket' ticket.id %}">
+    ✅ Accept & Start Work
+</a>
+
+<br><br>
+
+<form method="post" action="{% url 'admin_reject_ticket' ticket.id %}">
+    {% csrf_token %}
+    <input type="text"
+           name="rejection_reason"
+           placeholder="Reason for rejection"
+           required>
+    <button type="submit">❌ Reject Ticket</button>
+</form>
+{% endif %}
+
