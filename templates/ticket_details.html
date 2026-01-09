@@ -4,7 +4,7 @@
 
 <h2>Ticket Details</h2>
 
-<table border="1" cellpadding="8">
+<table border="1" cellpadding="8" width="100%">
     <tr>
         <th>Ticket ID</th>
         <td>{{ ticket.id }}</td>
@@ -22,27 +22,25 @@
 
     <tr>
         <th>Raised By</th>
-        <td>{{ ticket.raised_by.username }}</td>
-    </tr>
-
-    <tr>
-        <th>Department</th>
-        <td>{{ ticket.department }}</td>
+        <td>
+            {{ ticket.raised_by.username }}
+            ({{ ticket.raised_by.role }} – {{ ticket.department }})
+        </td>
     </tr>
 
     <tr>
         <th>Raised On</th>
-        <td>{{ ticket.created_at }}</td>
+        <td>{{ ticket.created_at|date:"d M Y H:i" }}</td>
     </tr>
 
     <tr>
         <th>Status</th>
-        <td>{{ ticket.status }}</td>
+        <td><strong>{{ ticket.status }}</strong></td>
     </tr>
 
     <tr>
         <th>Approval Status</th>
-        <td>{{ ticket.approval_status }}</td>
+        <td><strong>{{ ticket.approval_status }}</strong></td>
     </tr>
 
     <tr>
@@ -54,7 +52,9 @@
         <th>Issue Image</th>
         <td>
             {% if ticket.attachment %}
-                <img src="{{ ticket.attachment.url }}" width="400">
+                <a href="{{ ticket.attachment.url }}" target="_blank">
+                    <img src="{{ ticket.attachment.url }}" width="350">
+                </a>
             {% else %}
                 No image uploaded
             {% endif %}
@@ -77,17 +77,42 @@
 </table>
 
 <br>
-
 <a href="/">⬅ Back to Dashboard</a>
+
+<hr>
+
+{# ================= HOD / MANAGER APPROVAL ================= #}
+
+{% if ticket.approval_status == 'PENDING_HOD' %}
+    {% if user.role == 'HOD' or user.role == 'MANAGER' %}
+
+    <h3>Approve / Reject Ticket</h3>
+
+    <a href="{% url 'approve_ticket' ticket.id %}" class="btn btn-success">
+        ✅ Approve Ticket
+    </a>
+
+    <br><br>
+
+    <form method="post" action="{% url 'reject_ticket' ticket.id %}">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger">
+            ❌ Reject Ticket
+        </button>
+    </form>
+
+    {% endif %}
+{% endif %}
 
 <hr>
 
 {# ================= ADMIN ACTIONS ================= #}
 
 {% if user.role == 'ADMIN' and ticket.status == 'NEW' %}
+
 <h3>Admin Actions</h3>
 
-<a href="{% url 'admin_accept_ticket' ticket.id %}">
+<a href="{% url 'admin_accept_ticket' ticket.id %}" class="btn btn-primary">
     Accept & Start Work
 </a>
 
@@ -99,12 +124,16 @@
            name="rejection_reason"
            placeholder="Reason for rejection"
            required>
-    <button type="submit">Reject Ticket</button>
+    <br><br>
+    <button type="submit" class="btn btn-danger">
+        Reject Ticket
+    </button>
 </form>
+
 {% endif %}
 
-
 {% if user.role == 'ADMIN' and ticket.status == 'IN_PROGRESS' %}
+
 <hr>
 <h3>Admin Close Ticket</h3>
 
@@ -113,27 +142,31 @@
     <textarea name="admin_close_comment"
               placeholder="Work done / resolution details"
               required></textarea>
-    <br>
-    <button type="submit">Close Ticket (Admin)</button>
+    <br><br>
+    <button type="submit" class="btn btn-warning">
+        Close Ticket (Admin)
+    </button>
 </form>
+
 {% endif %}
 
-{# ================= HOD / MANAGER FINAL CLOSE ================= #}
+{# ================= FINAL CLOSE BY HOD / MANAGER ================= #}
 
-{% if ticket.status == 'RESOLVED_BY_ADMIN' %}
-    {% if user.role == 'HOD' or user.role == 'MANAGER' %}
-    <hr>
-    <h3>Final Closure (HOD / Manager)</h3>
+{% if ticket.status == 'ADMIN_CLOSED' and user.role in 'HOD MANAGER' %}
+<hr>
+<h3>Final Closure (HOD / Manager)</h3>
 
-    <form method="post" action="{% url 'final_close_ticket' ticket.id %}">
-        {% csrf_token %}
-        <textarea name="final_close_comment"
-                  placeholder="Final confirmation / remarks"
-                  required></textarea>
-        <br>
-        <button type="submit">Final Close Ticket</button>
-    </form>
-    {% endif %}
+<form method="post" action="{% url 'final_close_ticket' ticket.id %}">
+    {% csrf_token %}
+    <textarea
+        name="final_close_comment"
+        placeholder="Final confirmation / remarks"
+        required
+        style="width:100%; height:80px;"
+    ></textarea>
+    <br><br>
+    <button type="submit">Final Close Ticket</button>
+</form>
 {% endif %}
 
 {% endblock %}

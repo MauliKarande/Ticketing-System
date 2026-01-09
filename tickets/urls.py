@@ -14,6 +14,9 @@ urlpatterns = [
     path('manager/dashboard/', views.manager_dashboard, name='manager_dashboard'),
     path('login/', views.login_view, name='login'),
     path('logout/', views.logout_view, name='logout'),
+    path('admin/close/<int:ticket_id>/', views.admin_close_ticket, name='admin_close_ticket'),
+
+    path('final-close/<int:ticket_id>/', views.final_close_ticket, name='final_close_ticket'),
 
 
 

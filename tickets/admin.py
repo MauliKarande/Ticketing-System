@@ -7,17 +7,23 @@ class TicketAdmin(admin.ModelAdmin):
     list_display = (
         'id',
         'title',
-        'issue_type',
         'status',
         'approval_status',
-        'raised_by',
         'department',
+        'raised_by',
         'created_at',
     )
-    list_filter = ('status', 'approval_status', 'issue_type', 'department')
+    list_filter = ('status', 'approval_status', 'department')
     search_fields = ('title', 'description')
+    ordering = ('-created_at',)
 
 
 @admin.register(TicketComment)
 class TicketCommentAdmin(admin.ModelAdmin):
-    list_display = ('ticket', 'commented_by', 'created_at')
+    list_display = (
+        'ticket',
+        'commented_by',
+        'created_at',
+    )
+    search_fields = ('comment',)
+    ordering = ('-created_at',)

@@ -1,26 +1,37 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth import authenticate, login, logout
 from django.utils import timezone
 
 from .models import Ticket
 from .forms import TicketCreateForm
 
-from django.contrib.auth import authenticate, login, logout
 
+# ================= ADMIN ACTIONS =================
+
+@login_required
+def admin_dashboard(request):
+    if request.user.role != 'ADMIN':
+        return redirect('/')
+
+    # Admin sees all active tickets (until FINAL_CLOSED)
+    tickets = Ticket.objects.exclude(status='FINAL_CLOSED').order_by('-created_at')
+
+    return render(request, 'admin_dashboard.html', {
+        'tickets': tickets
+    })
 
 
 @login_required
 def admin_accept_ticket(request, ticket_id):
     ticket = get_object_or_404(Ticket, id=ticket_id)
 
-    # Only Admin can accept
     if request.user.role != 'ADMIN':
-        return redirect('admin_dashboard')
+        return redirect('/')
 
     ticket.status = 'IN_PROGRESS'
     ticket.assigned_to = request.user
     ticket.accepted_at = timezone.now()
-    ticket.admin_comment = "Accepted by admin"
     ticket.save()
 
     return redirect('admin_dashboard')
@@ -31,35 +42,33 @@ def admin_reject_ticket(request, ticket_id):
     ticket = get_object_or_404(Ticket, id=ticket_id)
 
     if request.user.role != 'ADMIN':
-        return redirect('admin_dashboard')
+        return redirect('/')
 
     if request.method == 'POST':
-        reason = request.POST.get('rejection_reason')
-
-        if reason:
-            ticket.status = 'REJECTED'
-            ticket.rejection_reason = reason
-            ticket.save()
+        ticket.status = 'REJECTED'
+        ticket.rejection_reason = request.POST.get('rejection_reason')
+        ticket.save()
 
     return redirect('admin_dashboard')
 
 
-#temporary
-
-from django.shortcuts import render
-
-
 @login_required
-def admin_dashboard(request):
+def admin_close_ticket(request, ticket_id):
+    ticket = get_object_or_404(Ticket, id=ticket_id)
+
     if request.user.role != 'ADMIN':
         return redirect('/')
 
-    tickets = Ticket.objects.filter(status='NEW')
+    if request.method == 'POST':
+        ticket.status = 'ADMIN_CLOSED'
+        ticket.admin_comment = request.POST.get('admin_close_comment')
+        ticket.admin_closed_at = timezone.now()
+        ticket.save()
 
-    return render(request, 'admin_dashboard.html', {
-        'tickets': tickets
-    })
+    return redirect(f'/tickets/details/{ticket.id}/')
 
+
+# ================= TICKET CREATION =================
 
 @login_required
 def raise_ticket(request):
@@ -77,32 +86,30 @@ def raise_ticket(request):
                 ticket.approval_status = 'NOT_REQUIRED'
 
             ticket.save()
-            return redirect('/tickets/admin/dashboard/')
+            return redirect('/')
+
     else:
         form = TicketCreateForm()
 
     return render(request, 'raise_ticket.html', {'form': form})
 
 
+# ================= TICKET DETAILS =================
 
 @login_required
 def ticket_details(request, ticket_id):
     ticket = get_object_or_404(Ticket, id=ticket_id)
 
-    # ADMIN can view everything
     if request.user.role == 'ADMIN':
         pass
 
-    # MANAGER can view all tickets (read-only)
     elif request.user.role == 'MANAGER':
         pass
 
-    # HOD can view department tickets
     elif request.user.role == 'HOD':
         if ticket.department != request.user.department:
             return redirect('/')
 
-    # EMPLOYEE can view only own tickets
     elif request.user.role == 'EMPLOYEE':
         if ticket.raised_by != request.user:
             return redirect('/')
@@ -115,23 +122,22 @@ def ticket_details(request, ticket_id):
     })
 
 
-
-
+# ================= HOD / MANAGER APPROVAL =================
 
 @login_required
 def approve_ticket(request, ticket_id):
     ticket = get_object_or_404(Ticket, id=ticket_id)
 
-    # Only HOD or Manager can approve
     if request.user.role not in ['HOD', 'MANAGER']:
         return redirect('/')
 
-    # Approval only if pending
     if ticket.approval_status != 'PENDING_HOD':
-        return redirect('/')
+        return redirect(f'/tickets/details/{ticket.id}/')
 
+    # Approve on GET (because UI uses <a>)
     ticket.approval_status = 'APPROVED'
     ticket.approved_by = request.user
+    ticket.approved_at = timezone.now()
     ticket.save()
 
     return redirect(f'/tickets/details/{ticket.id}/')
@@ -141,7 +147,6 @@ def approve_ticket(request, ticket_id):
 def reject_ticket(request, ticket_id):
     ticket = get_object_or_404(Ticket, id=ticket_id)
 
-    # Only HOD or Manager can reject
     if request.user.role not in ['HOD', 'MANAGER']:
         return redirect('/')
 
@@ -150,21 +155,46 @@ def reject_ticket(request, ticket_id):
 
     if request.method == 'POST':
         ticket.approval_status = 'REJECTED'
+        ticket.rejection_reason = request.POST.get('rejection_reason')
         ticket.approved_by = request.user
         ticket.save()
 
     return redirect(f'/tickets/details/{ticket.id}/')
+
+
+# ================= FINAL CLOSE (HOD / MANAGER) =================
+
+@login_required
+def final_close_ticket(request, ticket_id):
+    ticket = get_object_or_404(Ticket, id=ticket_id)
+
+    if request.user.role not in ['HOD', 'MANAGER']:
+        return redirect('/')
+
+    if request.method == 'POST':
+        ticket.status = 'FINAL_CLOSED'
+        ticket.final_closed_by = request.user
+        ticket.final_closed_at = timezone.now()
+        ticket.save()
+
+    return redirect('/')
+
+
+# ================= DASHBOARDS =================
 
 @login_required
 def employee_dashboard(request):
     if request.user.role != 'EMPLOYEE':
         return redirect('/')
 
-    tickets = Ticket.objects.filter(raised_by=request.user).order_by('-created_at')
+    tickets = Ticket.objects.filter(
+        raised_by=request.user
+    ).exclude(status='FINAL_CLOSED').order_by('-created_at')
 
     return render(request, 'employee_dashboard.html', {
         'tickets': tickets
     })
+
 
 @login_required
 def hod_dashboard(request):
@@ -173,41 +203,44 @@ def hod_dashboard(request):
 
     tickets = Ticket.objects.filter(
         department=request.user.department
-    ).order_by('-created_at')
+    ).exclude(status='FINAL_CLOSED').order_by('-created_at')
 
     return render(request, 'hod_dashboard.html', {
         'tickets': tickets
     })
+
 
 @login_required
 def manager_dashboard(request):
     if request.user.role != 'MANAGER':
         return redirect('/')
 
-    tickets = Ticket.objects.all().order_by('-created_at')
+    tickets = Ticket.objects.exclude(
+        status='FINAL_CLOSED'
+    ).order_by('-created_at')
 
     return render(request, 'manager_dashboard.html', {
         'tickets': tickets
     })
 
 
-
-
+# ================= AUTH =================
 
 def login_view(request):
     if request.method == 'POST':
-        username = request.POST.get('username')
-        password = request.POST.get('password')
+        user = authenticate(
+            request,
+            username=request.POST.get('username'),
+            password=request.POST.get('password')
+        )
 
-        user = authenticate(request, username=username, password=password)
-
-        if user is not None:
+        if user:
             login(request, user)
             return redirect('/')
-        else:
-            return render(request, 'login.html', {
-                'error': 'Invalid username or password'
-            })
+
+        return render(request, 'login.html', {
+            'error': 'Invalid username or password'
+        })
 
     return render(request, 'login.html')
 
@@ -216,5 +249,3 @@ def login_view(request):
 def logout_view(request):
     logout(request)
     return redirect('/login/')
-
-

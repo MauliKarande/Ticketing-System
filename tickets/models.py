@@ -110,3 +110,21 @@ class TicketComment(models.Model):
 
     def __str__(self):
         return f"Comment on Ticket #{self.ticket.id}"
+
+
+
+class TicketComment(models.Model):
+    ticket = models.ForeignKey(
+        Ticket,
+        related_name='comments',
+        on_delete=models.CASCADE
+    )
+    commented_by = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE
+    )
+    comment = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Comment on Ticket #{self.ticket.id}"
