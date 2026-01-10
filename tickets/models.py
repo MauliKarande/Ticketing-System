@@ -24,10 +24,11 @@ class Ticket(models.Model):
     APPROVAL_STATUS_CHOICES = (
         ('NOT_REQUIRED', 'Not Required'),
         ('PENDING_HOD', 'Pending HOD Approval'),
-        ('PENDING_MANAGER', 'Pending Manager Approval'),
         ('APPROVED', 'Approved'),
         ('REJECTED', 'Rejected'),
     )
+
+    # ================= CORE FIELDS =================
 
     title = models.CharField(max_length=150)
     issue_type = models.CharField(max_length=20, choices=ISSUE_TYPE_CHOICES)
@@ -59,6 +60,8 @@ class Ticket(models.Model):
         blank=True
     )
 
+    # ================= STATUS =================
+
     status = models.CharField(
         max_length=20,
         choices=STATUS_CHOICES,
@@ -71,6 +74,8 @@ class Ticket(models.Model):
         default='NOT_REQUIRED'
     )
 
+    # ================= AUDIT / TIMELINE =================
+
     approved_by = models.ForeignKey(
         User,
         related_name='tickets_approved',
@@ -78,40 +83,36 @@ class Ticket(models.Model):
         null=True,
         blank=True
     )
+    approved_at = models.DateTimeField(null=True, blank=True)
+
+    accepted_at = models.DateTimeField(null=True, blank=True)
+
+    admin_closed_at = models.DateTimeField(null=True, blank=True)
+
+    final_closed_by = models.ForeignKey(
+        User,
+        related_name='tickets_final_closed',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True
+    )
+    final_closed_at = models.DateTimeField(null=True, blank=True)
+
+    # ================= COMMENTS =================
 
     admin_comment = models.TextField(null=True, blank=True)
     rejection_reason = models.TextField(null=True, blank=True)
     resolution_summary = models.TextField(null=True, blank=True)
 
     created_at = models.DateTimeField(auto_now_add=True)
-    accepted_at = models.DateTimeField(null=True, blank=True)
-    admin_closed_at = models.DateTimeField(null=True, blank=True)
-    final_closed_at = models.DateTimeField(null=True, blank=True)
 
     is_active = models.BooleanField(default=True)
 
     def __str__(self):
         return f"Ticket #{self.id} - {self.title}"
-    
-
-    #ticket comment 
-class TicketComment(models.Model):
-    ticket = models.ForeignKey(
-        Ticket,
-        related_name='comments',
-        on_delete=models.CASCADE
-    )
-    commented_by = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE
-    )
-    comment = models.TextField()
-    created_at = models.DateTimeField(auto_now_add=True)
-
-    def __str__(self):
-        return f"Comment on Ticket #{self.ticket.id}"
 
 
+# ================= TICKET COMMENTS =================
 
 class TicketComment(models.Model):
     ticket = models.ForeignKey(

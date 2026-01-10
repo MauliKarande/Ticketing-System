@@ -124,6 +124,7 @@ def ticket_details(request, ticket_id):
 
 # ================= HOD / MANAGER APPROVAL =================
 
+
 @login_required
 def approve_ticket(request, ticket_id):
     ticket = get_object_or_404(Ticket, id=ticket_id)
@@ -134,13 +135,13 @@ def approve_ticket(request, ticket_id):
     if ticket.approval_status != 'PENDING_HOD':
         return redirect(f'/tickets/details/{ticket.id}/')
 
-    # Approve on GET (because UI uses <a>)
     ticket.approval_status = 'APPROVED'
     ticket.approved_by = request.user
-    ticket.approved_at = timezone.now()
+    ticket.approved_at = timezone.now()   # ✅ THIS WAS MISSING
     ticket.save()
 
     return redirect(f'/tickets/details/{ticket.id}/')
+
 
 
 @login_required
@@ -173,11 +174,13 @@ def final_close_ticket(request, ticket_id):
 
     if request.method == 'POST':
         ticket.status = 'FINAL_CLOSED'
-        ticket.final_closed_by = request.user
-        ticket.final_closed_at = timezone.now()
+        ticket.final_closed_by = request.user      # ✅ SAVE USER
+        ticket.final_closed_at = timezone.now()    # ✅ SAVE TIME
+        ticket.resolution_summary = request.POST.get('final_close_comment')
         ticket.save()
 
-    return redirect('/')
+    return redirect(f'/tickets/details/{ticket.id}/')
+
 
 
 # ================= DASHBOARDS =================
