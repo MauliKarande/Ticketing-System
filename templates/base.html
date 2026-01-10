@@ -2,34 +2,140 @@
 <html>
 <head>
     <title>Ameya Tech Support</title>
+
+    <style>
+        body {
+            margin: 0;
+            font-family: "Segoe UI", Tahoma, sans-serif;
+            background: #f4f6fb;
+        }
+
+        /* NAVBAR */
+        .navbar {
+            background: #ffffff;
+            padding: 14px 28px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+        }
+
+        .nav-left {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .nav-left img {
+            height: 40px;
+            object-fit: contain;
+        }
+
+        .nav-title {
+            font-size: 19px;
+            font-weight: 600;
+            color: #1d2671;
+        }
+
+        /* RIGHT SECTION */
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            font-size: 14px;
+        }
+
+        .welcome-text {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .info-badge {
+            background: #eef1ff;
+            color: #1d2671;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        /* BUTTONS */
+        .nav-btn {
+            text-decoration: none;
+            padding: 8px 14px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 13px;
+            color: #1d2671;
+            background: #f1f3ff;
+            transition: all 0.2s ease;
+        }
+
+        .nav-btn:hover {
+            background: #1d2671;
+            color: #ffffff;
+        }
+
+        .logout-btn {
+            background: #ffecec;
+            color: #b30000;
+        }
+
+        .logout-btn:hover {
+            background: #b30000;
+            color: #ffffff;
+        }
+
+        /* PAGE CONTAINER */
+        .page-container {
+            padding: 30px;
+        }
+    </style>
 </head>
 <body>
 
-<!-- Navbar -->
-<div style="padding:10px; border-bottom:1px solid #ccc;">
-    <b>Ameya Tech Support</b> |
+<!-- NAVBAR -->
+<div class="navbar">
 
-    {{ request.user.username }} |
-    {{ request.user.role }} |
-    {{ request.user.department }}
+    <!-- LEFT -->
+    <div class="nav-left">
+        <img src="/media/ameya3D.png" alt="Ameya Logo">
+        <div class="nav-title">Ameya Tech Support</div>
+    </div>
 
-    | <a href="/">Dashboard</a>
-    | <a href="/tickets/raise/">Raise Ticket</a>
-    
-    <a href="{% url 'ticket_history' %}" class="btn btn-outline-primary"> |
-   <i class="fa fa-history"></i> Ticket History
-</a>
+    <!-- RIGHT -->
+    <div class="nav-right">
 
-    | <a href="/logout/">Logout</a>
+        <!-- Welcome -->
+        <div class="welcome-text">
+            Welcome, {{ request.user.first_name }} {{ request.user.last_name }}!
+        </div>
+
+        <!-- Role -->
+        <div class="info-badge">
+            👤 {{ request.user.role }}
+        </div>
+
+        <!-- Department -->
+        <div class="info-badge">
+            🏢 {{ request.user.department }}
+        </div>
+
+        <!-- Buttons -->
+        <a href="/" class="nav-btn">🏠 Dashboard</a>
+        <a href="/tickets/raise/" class="nav-btn">➕ Raise Ticket</a>
+        <a href="{% url 'ticket_history' %}" class="nav-btn">📜 Ticket History</a>
+        <a href="/logout/" class="nav-btn logout-btn">🚪 Logout</a>
+
+    </div>
 
 </div>
 
-
-<hr>
-
-<!-- Page Content -->
-{% block content %}
-{% endblock %}
+<!-- PAGE CONTENT -->
+<div class="page-container">
+    {% block content %}
+    {% endblock %}
+</div>
 
 </body>
 </html>

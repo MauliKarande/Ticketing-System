@@ -1,31 +1,171 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h2>All Tickets (Manager)</h2>
 
-<table border="1" cellpadding="8">
-<tr>
-    <th>ID</th>
-    <th>Title</th>
-    <th>Department</th>
-    <th>Status</th>
-    <th>View</th>
-</tr>
+<style>
+    .page-title {
+        font-size: 26px;
+        font-weight: 600;
+        color: #1d2671;
+        margin-bottom: 20px;
+    }
 
-{% for ticket in tickets %}
-<tr>
-    <td>{{ ticket.id }}</td>
-    <td>{{ ticket.title }}</td>
-    <td>{{ ticket.department }}</td>
-    <td>{{ ticket.status }}</td>
-    <td>
-        <a href="{% url 'ticket_details' ticket.id %}">View</a>
-    </td>
-</tr>
-{% empty %}
-<tr>
-    <td colspan="5">No tickets</td>
-</tr>
-{% endfor %}
-</table>
+    .tickets-card {
+        background: #ffffff;
+        border-radius: 16px;
+        padding: 25px;
+        box-shadow: 0 12px 30px rgba(0,0,0,0.08);
+        animation: fadeIn 0.4s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(8px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    thead {
+        background: linear-gradient(135deg, #1d2671, #c33764);
+        color: #ffffff;
+    }
+
+    th, td {
+        padding: 14px 12px;
+        text-align: left;
+        font-size: 14px;
+    }
+
+    tbody tr {
+        border-bottom: 1px solid #eee;
+        transition: background 0.2s ease;
+    }
+
+    tbody tr:hover {
+        background: #f9f9ff;
+    }
+
+    .dept-badge {
+        background: #eef1ff;
+        color: #1d2671;
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    .status-badge {
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+        display: inline-block;
+    }
+
+    .status-new {
+        background: #fff3cd;
+        color: #856404;
+    }
+
+    .status-in_progress {
+        background: #cce5ff;
+        color: #004085;
+    }
+
+    .status-approved {
+        background: #d4edda;
+        color: #155724;
+    }
+
+    .status-rejected {
+        background: #f8d7da;
+        color: #721c24;
+    }
+
+    .status-closed {
+        background: #d1e7dd;
+        color: #0f5132;
+    }
+
+    .view-btn {
+        padding: 6px 14px;
+        background: linear-gradient(135deg, #1d2671, #c33764);
+        color: #ffffff;
+        border-radius: 8px;
+        text-decoration: none;
+        font-size: 13px;
+        font-weight: 600;
+        transition: all 0.2s ease;
+    }
+
+    .view-btn:hover {
+        opacity: 0.9;
+        transform: translateY(-1px);
+    }
+
+    .empty-row {
+        text-align: center;
+        padding: 20px;
+        color: #777;
+        font-style: italic;
+    }
+</style>
+
+<h2 class="page-title">All Tickets (Manager)</h2>
+
+<div class="tickets-card">
+
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Title</th>
+                <th>Department</th>
+                <th>Status</th>
+                <th>View</th>
+            </tr>
+        </thead>
+
+        <tbody>
+        {% for ticket in tickets %}
+            <tr>
+                <td>#{{ ticket.id }}</td>
+                <td>{{ ticket.title }}</td>
+                <td>
+                    <span class="dept-badge">
+                        {{ ticket.department }}
+                    </span>
+                </td>
+                <td>
+                    <span class="status-badge status-{{ ticket.status|lower }}">
+                        {{ ticket.status }}
+                    </span>
+                </td>
+                <td>
+                    <a href="{% url 'ticket_details' ticket.id %}" class="view-btn">
+                        View
+                    </a>
+                </td>
+            </tr>
+        {% empty %}
+            <tr>
+                <td colspan="5" class="empty-row">
+                    No tickets
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+</div>
+
 {% endblock %}

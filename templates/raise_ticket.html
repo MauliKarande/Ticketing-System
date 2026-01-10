@@ -1,38 +1,168 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Raise IT Support Ticket</title>
-</head>
-<body>
+{% extends "base.html" %}
 
-<h2>Raise IT Support Ticket</h2>
+{% block content %}
 
-<form method="post" enctype="multipart/form-data">
-    {% csrf_token %}
+<style>
+    .page-title {
+        font-size: 26px;
+        font-weight: 600;
+        color: #1d2671;
+        margin-bottom: 20px;
+    }
 
-    <p>
-        <label><b>Title *</b></label><br>
-        {{ form.title }}
-    </p>
+    .form-card {
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 30px;
+    max-width: 700px;
+    margin: 0 auto;   /* ✅ THIS CENTERS THE FORM */
+    box-shadow: 0 12px 30px rgba(0,0,0,0.08);
+    animation: fadeIn 0.5s ease-in-out;
+}
 
-    <p>
-        <label><b>Issue Type *</b></label><br>
-        {{ form.issue_type }}
-    </p>
 
-    <p>
-        <label><b>Description *</b></label><br>
-        {{ form.description }}
-    </p>
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
 
-    <p>
-        <label><b>Screenshot (optional)</b></label><br>
-        {{ form.attachment }}
-    </p>
+    .form-group {
+        margin-bottom: 18px;
+    }
 
-    <br>
-    <button type="submit">Submit Ticket</button>
-</form>
+    .form-group label {
+        display: block;
+        font-size: 14px;
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 6px;
+    }
 
-</body>
-</html>
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+        width: 100%;
+        padding: 10px 12px;
+        border-radius: 8px;
+        border: 1px solid #ccc;
+        font-size: 14px;
+        font-family: inherit;
+        outline: none;
+        transition: all 0.25s ease;
+    }
+
+    .form-group textarea {
+        min-height: 120px;
+        resize: vertical;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+        border-color: #1d2671;
+        box-shadow: 0 0 6px rgba(29, 38, 113, 0.3);
+    }
+
+    .file-input {
+        border: 1px dashed #aaa;
+        padding: 12px;
+        border-radius: 8px;
+        background: #fafafa;
+    }
+
+    .form-actions {
+        margin-top: 25px;
+        display: flex;
+        gap: 12px;
+    }
+
+    .submit-btn {
+        padding: 10px 22px;
+        border: none;
+        border-radius: 10px;
+        background: linear-gradient(135deg, #1d2671, #c33764);
+        color: #ffffff;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.25s ease;
+    }
+
+    .submit-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+    }
+
+    .cancel-btn {
+        padding: 10px 22px;
+        border-radius: 10px;
+        text-decoration: none;
+        background: #f1f3ff;
+        color: #1d2671;
+        font-size: 14px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+    }
+
+    .cancel-btn:hover {
+        background: #1d2671;
+        color: #ffffff;
+    }
+
+    .required {
+        color: red;
+        font-weight: bold;
+    }
+</style>
+
+<h2 class="page-title">Raise IT Support Ticket</h2>
+
+<div class="form-card">
+
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        <div class="form-group">
+            <label>Title <span class="required">*</span></label>
+            {{ form.title }}
+        </div>
+
+        <div class="form-group">
+            <label>Issue Type <span class="required">*</span></label>
+            {{ form.issue_type }}
+        </div>
+
+        <div class="form-group">
+            <label>Description <span class="required">*</span></label>
+            {{ form.description }}
+        </div>
+
+        <div class="form-group">
+            <label>Screenshot (optional)</label>
+            <div class="file-input">
+                {{ form.attachment }}
+            </div>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="submit-btn">
+                📩 Submit Ticket
+            </button>
+
+            <a href="/" class="cancel-btn">
+                ❌ Cancel
+            </a>
+        </div>
+
+    </form> </centor></div>
+
+</div>
+
+{% endblock %}

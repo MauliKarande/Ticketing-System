@@ -1,21 +1,155 @@
-<h2>Ameya Tech Support – Login</h2>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Ameya Tech Support | Login</title>
 
-{% if error %}
-<p style="color:red;">{{ error }}</p>
-{% endif %}
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1d2671, #c33764);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
 
-<form method="post">
-    {% csrf_token %}
+        .login-container {
+            background: #ffffff;
+            width: 380px;
+            padding: 40px 35px;
+            border-radius: 14px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
+            text-align: center;
+            animation: fadeIn 0.8s ease-in-out;
+        }
 
-    <p>
-        <label>Username</label><br>
-        <input type="text" name="username" required>
-    </p>
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
 
-    <p>
-        <label>Password</label><br>
-        <input type="password" name="password" required>
-    </p>
+        .login-container img {
+            width: 250px;
+            margin-bottom: 8px;
+        }
 
-    <button type="submit">Login</button>
-</form>
+        .login-container h2 {
+    margin-top: 5px;      /* ⬅ added */
+    margin-bottom: 18px;  /* ⬅ reduced */
+    color: #1d2671;
+    font-weight: 600;
+}
+
+
+        .form-group {
+            text-align: left;
+            margin-bottom: 18px;
+        }
+
+        .form-group label {
+            font-size: 14px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 6px;
+            display: block;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 10px 12px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            font-size: 14px;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus {
+            border-color: #1d2671;
+            box-shadow: 0 0 6px rgba(29, 38, 113, 0.3);
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            background: linear-gradient(135deg, #1d2671, #c33764);
+            color: white;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+        }
+
+        .error-message {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 10px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            font-size: 14px;
+        }
+
+        .footer-text {
+            margin-top: 20px;
+            font-size: 12px;
+            color: #777;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="login-container">
+
+        <!-- LOGO -->
+        <img src="/media/ameya3D.png" alt="Ameya Tech Support Logo">
+
+        <h2>Ameya Tech Support</h2>
+
+        {% if error %}
+            <div class="error-message">
+                {{ error }}
+            </div>
+        {% endif %}
+
+        <form method="post">
+            {% csrf_token %}
+
+            <div class="form-group">
+                <label>Username</label>
+                <input type="text" name="username" placeholder="Enter your username" required>
+            </div>
+
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" name="password" placeholder="Enter your password" required>
+            </div>
+
+            <button type="submit" class="login-btn">
+                Login
+            </button>
+        </form>
+
+        <div class="footer-text">
+            © {{ year|default:"2026" }} Ameya Tech Support
+        </div>
+
+    </div>
+
+</body>
+</html>
