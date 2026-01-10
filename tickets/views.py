@@ -97,7 +97,7 @@ def raise_ticket(request):
 # ================= TICKET DETAILS =================
 
 @login_required
-def ticket_details(request, ticket_id):
+def ticket_detail(request, ticket_id):
     ticket = get_object_or_404(Ticket, id=ticket_id)
 
     if request.user.role == 'ADMIN':
@@ -252,3 +252,25 @@ def login_view(request):
 def logout_view(request):
     logout(request)
     return redirect('/login/')
+
+
+@login_required
+def ticket_history(request):
+    user = request.user
+
+    if user.role == 'EMPLOYEE':
+        tickets = Ticket.objects.filter(raised_by=user)
+
+    elif user.role == 'HOD':
+        tickets = Ticket.objects.filter(department=user.department)
+
+    elif user.role in ['MANAGER', 'ADMIN']:
+        tickets = Ticket.objects.all()
+
+    else:
+        tickets = Ticket.objects.none()
+
+    return render(request, 'ticket_history.html', {
+    'tickets': tickets
+})
+
