@@ -3,231 +3,352 @@
 {% block content %}
 
 <style>
-    .page-title {
-        font-size: 26px;
+    .back-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        text-decoration: none;
         font-weight: 600;
-        color: #1d2671;
+        font-size: 13.5px;
+        color: var(--primary);
+        margin-bottom: 16px;
+    }
+    .back-link:hover { text-decoration: underline; }
+
+    .detail-header {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 14px;
         margin-bottom: 20px;
     }
 
+    .page-title {
+        font-size: 24px;
+        font-weight: 700;
+        color: var(--primary);
+        margin: 0 0 6px 0;
+    }
+
+    .ticket-id-tag { color: var(--text-muted); font-weight: 600; font-size: 14px; }
+
+    .badge-row { display: flex; gap: 8px; flex-wrap: wrap; }
+
     .card {
-        background: #ffffff;
-        border-radius: 16px;
-        padding: 25px;
-        margin-bottom: 25px;
-        box-shadow: 0 12px 30px rgba(0,0,0,0.08);
+        background: var(--surface);
+        border-radius: var(--radius-lg);
+        padding: 24px;
+        margin-bottom: 22px;
+        box-shadow: var(--shadow-card);
     }
 
     .card h3 {
-        margin-top: 0;
-        color: #1d2671;
-        font-size: 20px;
-        margin-bottom: 15px;
+        margin: 0 0 16px 0;
+        color: var(--primary);
+        font-size: 17px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .card h3 .icon { width: 18px; height: 18px; }
+
+    .info-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 16px 28px;
     }
 
-    .details-table {
-        width: 100%;
-        border-collapse: collapse;
+    .info-item label {
+        display: block;
+        font-size: 11.5px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: var(--text-muted);
+        margin-bottom: 4px;
     }
 
-    .details-table th {
-        width: 220px;
-        text-align: left;
-        padding: 10px;
-        background: #f4f6fb;
-        color: #333;
-        font-weight: 600;
-    }
+    .info-item div.value { font-size: 14.5px; color: var(--text); }
 
-    .details-table td {
-        padding: 10px;
-        border-bottom: 1px solid #eee;
-    }
+    .info-item.full { grid-column: 1 / -1; }
 
-    .status-badge {
+    .status-badge, .approval-badge {
         padding: 6px 14px;
         border-radius: 20px;
         font-size: 12px;
-        font-weight: 600;
+        font-weight: 700;
         display: inline-block;
     }
 
-    .status-new { background:#fff3cd; color:#856404; }
-    .status-in_progress { background:#cce5ff; color:#004085; }
-    .status-approved { background:#d4edda; color:#155724; }
-    .status-rejected { background:#f8d7da; color:#721c24; }
-    .status-admin_closed { background:#e2e3e5; color:#383d41; }
-    .status-closed { background:#d1e7dd; color:#0f5132; }
+    .status-new { background: var(--warn-bg); color: var(--warn-fg); }
+    .status-in_progress { background: var(--info-bg); color: var(--info-fg); }
+    .status-rejected { background: var(--bad-bg); color: var(--bad-fg); }
+    .status-admin_closed { background: var(--neutral-bg); color: var(--neutral-fg); }
+    .status-final_closed { background: var(--ok-bg); color: var(--ok-fg); }
+
+    .approval-not_required { background: var(--neutral-bg); color: var(--neutral-fg); }
+    .approval-pending_hod { background: var(--warn-bg); color: var(--warn-fg); }
+    .approval-approved { background: var(--ok-bg); color: var(--ok-fg); }
+    .approval-rejected { background: var(--bad-bg); color: var(--bad-fg); }
 
     .attachment-img {
-        max-width: 350px;
-        border-radius: 10px;
-        border: 1px solid #ddd;
+        max-width: 360px;
+        border-radius: var(--radius-md);
+        border: 1px solid var(--border);
         margin-top: 8px;
+        display: block;
     }
 
     .action-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
         padding: 10px 18px;
-        border-radius: 10px;
+        border-radius: var(--radius-md);
         text-decoration: none;
-        font-weight: 600;
-        font-size: 14px;
-        display: inline-block;
-        margin-right: 10px;
+        font-weight: 700;
+        font-size: 13.5px;
         border: none;
         cursor: pointer;
+        transition: all 0.18s ease;
     }
+    .action-btn:hover { transform: translateY(-1px); }
 
-    .btn-approve { background:#d4edda; color:#155724; }
-    .btn-reject { background:#f8d7da; color:#721c24; }
-    .btn-primary { background:#1d2671; color:#fff; }
-    .btn-warning { background:#fff3cd; color:#856404; }
-    .btn-dark { background:#343a40; color:#fff; }
+    .btn-approve { background: var(--ok-bg); color: var(--ok-fg); }
+    .btn-reject { background: var(--bad-bg); color: var(--bad-fg); }
+    .btn-primary { background: var(--gradient); color: #fff; }
+    .btn-warning { background: var(--warn-bg); color: var(--warn-fg); }
+    .btn-dark { background: var(--primary-dark); color: #fff; }
 
     textarea, input[type="text"] {
         width: 100%;
-        padding: 10px;
-        border-radius: 8px;
+        padding: 10px 12px;
+        border-radius: var(--radius-sm);
         border: 1px solid #ccc;
         font-size: 14px;
+        font-family: inherit;
+        outline: none;
+    }
+    textarea:focus, input[type="text"]:focus {
+        border-color: var(--primary);
+        box-shadow: 0 0 6px rgba(29,38,113,0.25);
     }
 
-    textarea {
-        min-height: 90px;
-        resize: vertical;
-    }
+    textarea { min-height: 90px; resize: vertical; }
 
-    .back-link {
-        text-decoration: none;
-        font-weight: 600;
-        color: #1d2671;
+    /* TIMELINE */
+    .timeline { list-style: none; margin: 0; padding: 0; }
+    .timeline li {
+        position: relative;
+        padding: 4px 0 18px 26px;
+        border-left: 2px solid var(--border);
+        margin-left: 8px;
     }
+    .timeline li:last-child { border-left-color: transparent; padding-bottom: 0; }
+    .timeline li::before {
+        content: "";
+        position: absolute;
+        left: -7px;
+        top: 6px;
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background: var(--gradient);
+        border: 2px solid #fff;
+        box-shadow: 0 0 0 2px var(--border);
+    }
+    .timeline .t-stage { font-weight: 700; font-size: 14px; color: var(--text); }
+    .timeline .t-meta { font-size: 12.5px; color: var(--text-muted); margin-top: 2px; }
 
-    .timeline-table th {
-        background: #1d2671;
-        color: #fff;
-        padding: 10px;
+    /* STAGE LOG */
+    .stage-item {
+        border: 1px solid var(--border);
+        border-radius: var(--radius-md);
+        padding: 14px 16px;
+        margin-bottom: 12px;
+        background: #fbfbff;
     }
+    .stage-item .stage-title {
+        font-weight: 700;
+        color: var(--primary);
+        font-size: 14.5px;
+        margin-bottom: 4px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+    .stage-item .stage-desc { font-size: 13.5px; color: var(--text); white-space: pre-line; }
+    .stage-item .stage-meta { font-size: 12px; color: var(--text-muted); margin-top: 6px; }
 
-    .timeline-table td {
-        padding: 10px;
-        border-bottom: 1px solid #eee;
-    }
+    .no-data { color: var(--text-muted); font-style: italic; font-size: 13.5px; }
+
+    .stage-form-grid { display: grid; gap: 12px; max-width: 560px; }
 </style>
 
-<h2 class="page-title">Ticket Details</h2>
+<a href="/" class="back-link">{% include "partials/icon.html" with name="home" %} Back to Dashboard</a>
+
+<div class="detail-header">
+    <div>
+        <h2 class="page-title">{{ ticket.title }}</h2>
+        <span class="ticket-id-tag">Ticket #{{ ticket.id }}</span>
+    </div>
+    <div class="badge-row">
+        <span class="status-badge status-{{ ticket.status|lower }}">{{ ticket.get_status_display }}</span>
+        <span class="approval-badge approval-{{ ticket.approval_status|lower }}">{{ ticket.get_approval_status_display }}</span>
+    </div>
+</div>
 
 <!-- ================= BASIC DETAILS ================= -->
 <div class="card">
-    <table class="details-table">
-        <tr><th>Ticket ID</th><td>#{{ ticket.id }}</td></tr>
-        <tr><th>Title</th><td>{{ ticket.title }}</td></tr>
-        <tr><th>Issue Type</th><td>{{ ticket.issue_type }}</td></tr>
-        <tr>
-            <th>Raised By</th>
-            <td>{{ ticket.raised_by.username }} ({{ ticket.raised_by.role }} – {{ ticket.department }})</td>
-        </tr>
-        <tr><th>Raised On</th><td>{{ ticket.created_at|date:"d M Y H:i" }}</td></tr>
-        <tr>
-            <th>Status</th>
-            <td>
-                <span class="status-badge status-{{ ticket.status|lower }}">
-                    {{ ticket.status }}
-                </span>
-            </td>
-        </tr>
-        <tr><th>Approval Status</th><td><strong>{{ ticket.approval_status }}</strong></td></tr>
-        <tr><th>Description</th><td>{{ ticket.description }}</td></tr>
+    <h3>{% include "partials/icon.html" with name="ticket" %} Ticket Information</h3>
 
-        <tr>
-            <th>Issue Image</th>
-            <td>
+    <div class="info-grid">
+        <div class="info-item">
+            <label>Issue Type</label>
+            <div class="value">{{ ticket.get_issue_type_display }}</div>
+        </div>
+        <div class="info-item">
+            <label>Raised On</label>
+            <div class="value">{{ ticket.created_at|date:"d M Y, H:i" }}</div>
+        </div>
+        <div class="info-item">
+            <label>Raised By</label>
+            <div class="value">{{ ticket.raised_by.username }} ({{ ticket.raised_by.role }})</div>
+        </div>
+        <div class="info-item">
+            <label>Department</label>
+            <div class="value">{{ ticket.department|default:"—" }}</div>
+        </div>
+        <div class="info-item full">
+            <label>Description</label>
+            <div class="value">{{ ticket.description|linebreaksbr }}</div>
+        </div>
+
+        <div class="info-item full">
+            <label>Attached Screenshot</label>
+            <div class="value">
                 {% if ticket.attachment %}
                     <a href="{{ ticket.attachment.url }}" target="_blank">
                         <img src="{{ ticket.attachment.url }}" class="attachment-img">
                     </a>
                 {% else %}
-                    No image uploaded
+                    <span class="no-data">No image uploaded</span>
                 {% endif %}
-            </td>
-        </tr>
+            </div>
+        </div>
 
         {% if ticket.admin_comment %}
-        <tr><th>Admin Comment</th><td>{{ ticket.admin_comment }}</td></tr>
+        <div class="info-item full">
+            <label>Admin Comment</label>
+            <div class="value">{{ ticket.admin_comment }}</div>
+        </div>
         {% endif %}
 
         {% if ticket.resolution_summary %}
-        <tr><th>Final Close Comment</th><td>{{ ticket.resolution_summary }}</td></tr>
+        <div class="info-item full">
+            <label>Final Close Comment</label>
+            <div class="value">{{ ticket.resolution_summary }}</div>
+        </div>
         {% endif %}
 
         {% if ticket.rejection_reason %}
-        <tr><th>Rejection Reason</th><td>{{ ticket.rejection_reason }}</td></tr>
+        <div class="info-item full">
+            <label>Rejection Reason</label>
+            <div class="value">{{ ticket.rejection_reason }}</div>
+        </div>
         {% endif %}
-    </table>
+    </div>
 </div>
 
-<a href="/" class="back-link">⬅ Back to Dashboard</a>
+<!-- ================= WORK PROGRESS STAGES ================= -->
+<div class="card" id="add-stage">
+    <h3>{% include "partials/icon.html" with name="layers" %} Work Progress Stages</h3>
+
+    {% for stage in ticket.stages.all %}
+        <div class="stage-item">
+            <div class="stage-title">
+                {% include "partials/icon.html" with name="progress" %}
+                Stage {{ forloop.counter }}{% if stage.title %} — {{ stage.title }}{% endif %}
+            </div>
+            <div class="stage-desc">{{ stage.description|linebreaksbr }}</div>
+            <div class="stage-meta">
+                {{ stage.added_by.username|default:"Admin" }} · {{ stage.created_at|date:"d M Y, H:i" }}
+            </div>
+        </div>
+    {% empty %}
+        <p class="no-data">No work stages logged yet.</p>
+    {% endfor %}
+
+    {% if user.role == 'ADMIN' and ticket.status == 'IN_PROGRESS' %}
+        <form method="post" action="{% url 'admin_add_stage' ticket.id %}" class="stage-form-grid" style="margin-top:18px;">
+            {% csrf_token %}
+            <input type="text" name="title" placeholder="Stage title (optional), e.g. Diagnosed issue">
+            <textarea name="description" placeholder="Describe what was done in this stage" required></textarea>
+            <div>
+                <button type="submit" class="action-btn btn-primary">
+                    {% include "partials/icon.html" with name="plus" %} Add Stage
+                </button>
+            </div>
+        </form>
+    {% endif %}
+</div>
 
 <!-- ================= STATUS SUMMARY ================= -->
 <div class="card">
-    <h3>Ticket Status Summary</h3>
+    <h3>{% include "partials/icon.html" with name="history" %} Ticket Timeline</h3>
 
-    <table class="timeline-table" width="100%">
-        <tr>
-            <th>Stage</th>
-            <th>By</th>
-            <th>Date & Time</th>
-        </tr>
-
-        <tr>
-            <td>Raised</td>
-            <td>{{ ticket.raised_by.username }} ({{ ticket.raised_by.role }})</td>
-            <td>{{ ticket.created_at|date:"d M Y H:i" }}</td>
-        </tr>
+    <ul class="timeline">
+        <li>
+            <div class="t-stage">Raised</div>
+            <div class="t-meta">{{ ticket.raised_by.username }} ({{ ticket.raised_by.role }}) · {{ ticket.created_at|date:"d M Y H:i" }}</div>
+        </li>
 
         {% if ticket.approved_by %}
-        <tr>
-            <td>Approved</td>
-            <td>{{ ticket.approved_by.username }} ({{ ticket.approved_by.role }})</td>
-            <td>{{ ticket.approved_at|date:"d M Y H:i" }}</td>
-        </tr>
+        <li>
+            <div class="t-stage">Approved</div>
+            <div class="t-meta">{{ ticket.approved_by.username }} ({{ ticket.approved_by.role }}) · {{ ticket.approved_at|date:"d M Y H:i" }}</div>
+        </li>
         {% endif %}
 
         {% if ticket.accepted_at %}
-        <tr>
-            <td>Accepted by Admin</td>
-            <td>Admin</td>
-            <td>{{ ticket.accepted_at|date:"d M Y H:i" }}</td>
-        </tr>
+        <li>
+            <div class="t-stage">Accepted by Admin</div>
+            <div class="t-meta">Admin · {{ ticket.accepted_at|date:"d M Y H:i" }}</div>
+        </li>
         {% endif %}
 
         {% if ticket.admin_closed_at %}
-        <tr>
-            <td>Closed by Admin</td>
-            <td>Admin</td>
-            <td>{{ ticket.admin_closed_at|date:"d M Y H:i" }}</td>
-        </tr>
+        <li>
+            <div class="t-stage">Closed by Admin</div>
+            <div class="t-meta">Admin · {{ ticket.admin_closed_at|date:"d M Y H:i" }}</div>
+        </li>
         {% endif %}
 
         {% if ticket.final_closed_by %}
-        <tr>
-            <td>Final Closed</td>
-            <td>{{ ticket.final_closed_by.username }} ({{ ticket.final_closed_by.role }})</td>
-            <td>{{ ticket.final_closed_at|date:"d M Y H:i" }}</td>
-        </tr>
+        <li>
+            <div class="t-stage">Final Closed</div>
+            <div class="t-meta">{{ ticket.final_closed_by.username }} ({{ ticket.final_closed_by.role }}) · {{ ticket.final_closed_at|date:"d M Y H:i" }}</div>
+        </li>
         {% endif %}
-    </table>
+    </ul>
 </div>
 
 <!-- ================= HOD / MANAGER ================= -->
 {% if ticket.approval_status == 'PENDING_HOD' and user.role in 'HOD MANAGER' %}
 <div class="card">
-    <h3>Approve / Reject Ticket</h3>
-    <a href="{% url 'approve_ticket' ticket.id %}" class="action-btn btn-approve">✅ Approve</a>
+    <h3>{% include "partials/icon.html" with name="check" %} Approve / Reject Ticket</h3>
+    <a href="{% url 'approve_ticket' ticket.id %}" class="action-btn btn-approve">
+        {% include "partials/icon.html" with name="check" %} Approve
+    </a>
 
     <form method="post" action="{% url 'reject_ticket' ticket.id %}" style="margin-top:15px;">
         {% csrf_token %}
-        <button type="submit" class="action-btn btn-reject">❌ Reject</button>
+        <input type="text" name="rejection_reason" placeholder="Reason for rejection" required>
+        <br><br>
+        <button type="submit" class="action-btn btn-reject">
+            {% include "partials/icon.html" with name="x" %} Reject
+        </button>
     </form>
 </div>
 {% endif %}
@@ -235,30 +356,34 @@
 <!-- ================= ADMIN ================= -->
 {% if user.role == 'ADMIN' and ticket.status == 'NEW' %}
 <div class="card">
-    <h3>Admin Actions</h3>
+    <h3>{% include "partials/icon.html" with name="progress" %} Admin Actions</h3>
 
     <a href="{% url 'admin_accept_ticket' ticket.id %}" class="action-btn btn-primary">
-        Accept & Start Work
+        {% include "partials/icon.html" with name="check" %} Accept &amp; Start Work
     </a>
 
     <form method="post" action="{% url 'admin_reject_ticket' ticket.id %}" style="margin-top:15px;">
         {% csrf_token %}
         <input type="text" name="rejection_reason" placeholder="Reason for rejection" required>
         <br><br>
-        <button type="submit" class="action-btn btn-reject">Reject Ticket</button>
+        <button type="submit" class="action-btn btn-reject">
+            {% include "partials/icon.html" with name="x" %} Reject Ticket
+        </button>
     </form>
 </div>
 {% endif %}
 
 {% if user.role == 'ADMIN' and ticket.status == 'IN_PROGRESS' %}
 <div class="card">
-    <h3>Admin Close Ticket</h3>
+    <h3>{% include "partials/icon.html" with name="admin-closed" %} Admin Close Ticket</h3>
 
     <form method="post" action="{% url 'admin_close_ticket' ticket.id %}">
         {% csrf_token %}
         <textarea name="admin_close_comment" placeholder="Work done / resolution details" required></textarea>
         <br><br>
-        <button type="submit" class="action-btn btn-warning">Close Ticket (Admin)</button>
+        <button type="submit" class="action-btn btn-warning">
+            {% include "partials/icon.html" with name="admin-closed" %} Close Ticket (Admin)
+        </button>
     </form>
 </div>
 {% endif %}
@@ -266,13 +391,15 @@
 <!-- ================= FINAL CLOSE ================= -->
 {% if ticket.status == 'ADMIN_CLOSED' and user.role in 'HOD MANAGER' %}
 <div class="card">
-    <h3>Final Closure (HOD / Manager)</h3>
+    <h3>{% include "partials/icon.html" with name="flag" %} Final Closure (HOD / Manager)</h3>
 
     <form method="post" action="{% url 'final_close_ticket' ticket.id %}">
         {% csrf_token %}
         <textarea name="final_close_comment" placeholder="Final confirmation / remarks" required></textarea>
         <br><br>
-        <button type="submit" class="action-btn btn-dark">Final Close Ticket</button>
+        <button type="submit" class="action-btn btn-dark">
+            {% include "partials/icon.html" with name="flag" %} Final Close Ticket
+        </button>
     </form>
 </div>
 {% endif %}

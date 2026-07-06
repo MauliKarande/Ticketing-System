@@ -3,92 +3,232 @@
 {% block content %}
 
 <style>
-    .page-title {
-        font-size: 26px;
-        font-weight: 600;
-        color: #1d2671;
-        margin-bottom: 20px;
+    .page-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-bottom: 22px;
     }
 
+    .page-title {
+        font-size: 24px;
+        font-weight: 700;
+        color: var(--primary);
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    .page-title .icon { width: 24px; height: 24px; }
+
+    .page-subtitle {
+        color: var(--text-muted);
+        font-size: 13.5px;
+        margin-top: 4px;
+    }
+
+    /* TABS */
+    .tab-row {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 14px;
+        margin-bottom: 24px;
+    }
+
+    .tab-card {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-lg);
+        padding: 16px 18px;
+        text-decoration: none;
+        color: var(--text);
+        box-shadow: var(--shadow-card);
+        transition: all 0.18s ease;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .tab-card:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-hover);
+    }
+
+    .tab-card.active {
+        color: #fff;
+        background: var(--gradient);
+        border-color: transparent;
+    }
+
+    .tab-icon-wrap {
+        width: 42px;
+        height: 42px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        background: rgba(29,38,113,0.08);
+        color: var(--primary);
+    }
+
+    .tab-card.active .tab-icon-wrap {
+        background: rgba(255,255,255,0.18);
+        color: #fff;
+    }
+
+    .tab-icon-wrap .icon { width: 22px; height: 22px; }
+
+    .tab-label {
+        font-size: 13px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.4px;
+        opacity: 0.85;
+    }
+
+    .tab-count {
+        font-size: 24px;
+        font-weight: 800;
+        line-height: 1.1;
+    }
+
+    /* per-tab accent colors on the icon when not active */
+    .tab-pending .tab-icon-wrap { background: var(--warn-bg); color: var(--warn-fg); }
+    .tab-progress .tab-icon-wrap { background: var(--info-bg); color: var(--info-fg); }
+    .tab-admin_closed .tab-icon-wrap { background: var(--neutral-bg); color: var(--neutral-fg); }
+    .tab-closed .tab-icon-wrap { background: var(--ok-bg); color: var(--ok-fg); }
+
     .tickets-card {
-        background: #ffffff;
-        border-radius: 16px;
-        padding: 25px;
-        box-shadow: 0 12px 30px rgba(0,0,0,0.08);
-        animation: fadeIn 0.4s ease-in-out;
+        background: var(--surface);
+        border-radius: var(--radius-lg);
+        padding: 22px;
+        box-shadow: var(--shadow-card);
+        animation: fadeIn 0.3s ease-in-out;
     }
 
     @keyframes fadeIn {
-        from {
-            opacity: 0;
-            transform: translateY(8px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
+        from { opacity: 0; transform: translateY(8px); }
+        to { opacity: 1; transform: translateY(0); }
     }
 
-    table {
-        width: 100%;
-        border-collapse: collapse;
-    }
+    table { width: 100%; border-collapse: collapse; }
 
-    thead {
-        background: linear-gradient(135deg, #1d2671, #c33764);
-        color: #ffffff;
-    }
+    thead { background: var(--gradient); color: #ffffff; }
 
-    th, td {
-        padding: 14px 12px;
-        text-align: left;
-        font-size: 14px;
-    }
+    th, td { padding: 13px 12px; text-align: left; font-size: 13.5px; }
+    th:first-child { border-top-left-radius: var(--radius-sm); }
+    th:last-child { border-top-right-radius: var(--radius-sm); }
 
-    tbody tr {
-        border-bottom: 1px solid #eee;
-        transition: background 0.2s ease;
-    }
-
-    tbody tr:hover {
-        background: #f9f9ff;
-    }
+    tbody tr { border-bottom: 1px solid var(--border); transition: background 0.15s ease; }
+    tbody tr:hover { background: #f8f9ff; }
 
     .issue-badge {
-        background: #eef1ff;
-        color: #1d2671;
-        padding: 6px 12px;
+        display: inline-flex;
+        align-items: center;
+        background: var(--info-bg);
+        color: var(--primary);
+        padding: 5px 12px;
         border-radius: 20px;
         font-size: 12px;
         font-weight: 600;
+        white-space: nowrap;
     }
 
-    .view-btn {
-        padding: 6px 14px;
-        background: linear-gradient(135deg, #1d2671, #c33764);
-        color: #ffffff;
-        border-radius: 8px;
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 5px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 700;
+        white-space: nowrap;
+    }
+    .status-new { background: var(--warn-bg); color: var(--warn-fg); }
+    .status-in_progress { background: var(--info-bg); color: var(--info-fg); }
+    .status-admin_closed { background: var(--neutral-bg); color: var(--neutral-fg); }
+    .status-final_closed { background: var(--ok-bg); color: var(--ok-fg); }
+
+    .row-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+
+    .view-btn, .stage-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 7px 13px;
+        border-radius: var(--radius-sm);
         text-decoration: none;
-        font-size: 13px;
-        font-weight: 600;
-        transition: all 0.2s ease;
+        font-size: 12.5px;
+        font-weight: 700;
+        transition: all 0.18s ease;
+        border: none;
+        cursor: pointer;
     }
 
-    .view-btn:hover {
-        opacity: 0.9;
-        transform: translateY(-1px);
-    }
+    .view-btn { background: var(--gradient); color: #ffffff; }
+    .view-btn:hover { opacity: 0.92; transform: translateY(-1px); }
 
-    .empty-row {
-        text-align: center;
-        padding: 20px;
-        color: #777;
-        font-style: italic;
+    .stage-btn { background: var(--info-bg); color: var(--info-fg); }
+    .stage-btn:hover { background: var(--primary); color: #fff; }
+
+    .empty-row { text-align: center; padding: 34px; color: var(--text-muted); font-style: italic; }
+
+    @media (max-width: 900px) {
+        .tab-row { grid-template-columns: repeat(2, 1fr); }
     }
 </style>
 
-<h2 class="page-title">Admin Dashboard – New Tickets</h2>
+<div class="page-header">
+    <div>
+        <h2 class="page-title">
+            {% include "partials/icon.html" with name="layers" %}
+            Admin Dashboard
+        </h2>
+        <div class="page-subtitle">Track and progress every support ticket through its lifecycle.</div>
+    </div>
+</div>
 
+<!-- ================= TABS ================= -->
+<div class="tab-row">
+    <a href="?tab=pending" class="tab-card tab-pending {% if active_tab == 'pending' %}active{% endif %}">
+        <div class="tab-icon-wrap">{% include "partials/icon.html" with name="pending" %}</div>
+        <div>
+            <div class="tab-label">Pending</div>
+            <div class="tab-count">{{ counts.pending }}</div>
+        </div>
+    </a>
+
+    <a href="?tab=in_progress" class="tab-card tab-progress {% if active_tab == 'in_progress' %}active{% endif %}">
+        <div class="tab-icon-wrap">{% include "partials/icon.html" with name="progress" %}</div>
+        <div>
+            <div class="tab-label">In Progress</div>
+            <div class="tab-count">{{ counts.in_progress }}</div>
+        </div>
+    </a>
+
+    <a href="?tab=admin_closed" class="tab-card tab-admin_closed {% if active_tab == 'admin_closed' %}active{% endif %}">
+        <div class="tab-icon-wrap">{% include "partials/icon.html" with name="admin-closed" %}</div>
+        <div>
+            <div class="tab-label">Admin Closed</div>
+            <div class="tab-count">{{ counts.admin_closed }}</div>
+        </div>
+    </a>
+
+    <a href="?tab=closed" class="tab-card tab-closed {% if active_tab == 'closed' %}active{% endif %}">
+        <div class="tab-icon-wrap">{% include "partials/icon.html" with name="closed" %}</div>
+        <div>
+            <div class="tab-label">Closed Tickets</div>
+            <div class="tab-count">{{ counts.closed }}</div>
+        </div>
+    </a>
+</div>
+
+<!-- ================= TICKETS TABLE ================= -->
 <div class="tickets-card">
 
     <table>
@@ -98,7 +238,9 @@
                 <th>Title</th>
                 <th>Issue Type</th>
                 <th>Raised By</th>
-                <th>View</th>
+                <th>Department</th>
+                <th>Status</th>
+                <th>Actions</th>
             </tr>
         </thead>
 
@@ -107,23 +249,30 @@
             <tr>
                 <td>#{{ ticket.id }}</td>
                 <td>{{ ticket.title }}</td>
+                <td><span class="issue-badge">{{ ticket.get_issue_type_display }}</span></td>
+                <td>{{ ticket.raised_by.username }}</td>
+                <td>{{ ticket.department|default:"—" }}</td>
                 <td>
-                    <span class="issue-badge">
-                        {{ ticket.issue_type }}
+                    <span class="status-badge status-{{ ticket.status|lower }}">
+                        {{ ticket.get_status_display }}
                     </span>
                 </td>
-                <td>{{ ticket.raised_by.username }}</td>
                 <td>
-                    <a href="{% url 'ticket_details' ticket.id %}" class="view-btn">
-                        View
-                    </a>
+                    <div class="row-actions">
+                        <a href="{% url 'ticket_details' ticket.id %}" class="view-btn">
+                            {% include "partials/icon.html" with name="eye" %} View
+                        </a>
+                        {% if ticket.status == 'IN_PROGRESS' %}
+                        <a href="{% url 'ticket_details' ticket.id %}#add-stage" class="stage-btn">
+                            {% include "partials/icon.html" with name="plus" %} Add Stage
+                        </a>
+                        {% endif %}
+                    </div>
                 </td>
             </tr>
         {% empty %}
             <tr>
-                <td colspan="5" class="empty-row">
-                    No new tickets
-                </td>
+                <td colspan="7" class="empty-row">No tickets in this category</td>
             </tr>
         {% endfor %}
         </tbody>

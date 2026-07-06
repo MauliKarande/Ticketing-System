@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Ticket, TicketComment
+from .models import Ticket, TicketComment, TicketStage
 
 
 @admin.register(Ticket)
@@ -26,4 +26,16 @@ class TicketCommentAdmin(admin.ModelAdmin):
         'created_at',
     )
     search_fields = ('comment',)
+    ordering = ('-created_at',)
+
+
+@admin.register(TicketStage)
+class TicketStageAdmin(admin.ModelAdmin):
+    list_display = (
+        'ticket',
+        'title',
+        'added_by',
+        'created_at',
+    )
+    search_fields = ('title', 'description')
     ordering = ('-created_at',)

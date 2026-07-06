@@ -10,7 +10,7 @@
             padding: 0;
             height: 100vh;
             font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #1d2671, #c33764);
+            background: linear-gradient(135deg, #14325c, #2f6690);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -45,7 +45,7 @@
         .login-container h2 {
     margin-top: 5px;      /* ⬅ added */
     margin-bottom: 18px;  /* ⬅ reduced */
-    color: #1d2671;
+    color: #14325c;
     font-weight: 600;
 }
 
@@ -74,8 +74,8 @@
         }
 
         .form-group input:focus {
-            border-color: #1d2671;
-            box-shadow: 0 0 6px rgba(29, 38, 113, 0.3);
+            border-color: #14325c;
+            box-shadow: 0 0 6px rgba(20, 50, 92, 0.3);
         }
 
         .login-btn {
@@ -83,13 +83,26 @@
             padding: 12px;
             border: none;
             border-radius: 8px;
-            background: linear-gradient(135deg, #1d2671, #c33764);
+            background: linear-gradient(135deg, #14325c, #2f6690);
             color: white;
             font-size: 15px;
             font-weight: 600;
             cursor: pointer;
             transition: transform 0.2s ease, box-shadow 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
         }
+
+        .login-subtitle {
+            font-size: 13px;
+            color: #777;
+            margin-top: -12px;
+            margin-bottom: 20px;
+        }
+
+        .icon { width: 16px; height: 16px; }
 
         .login-btn:hover {
             transform: translateY(-2px);
@@ -120,6 +133,7 @@
         <img src="/media/ameya3D.png" alt="Ameya Tech Support Logo">
 
         <h2>Ameya Tech Support</h2>
+        <div class="login-subtitle">IT Ticketing System</div>
 
         {% if error %}
             <div class="error-message">
@@ -141,7 +155,7 @@
             </div>
 
             <button type="submit" class="login-btn">
-                Login
+                {% include "partials/icon.html" with name="check" %} Login
             </button>
         </form>
 

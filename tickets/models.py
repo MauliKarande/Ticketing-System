@@ -129,3 +129,29 @@ class TicketComment(models.Model):
 
     def __str__(self):
         return f"Comment on Ticket #{self.ticket.id}"
+
+
+# ================= WORK STAGES (ADMIN PROGRESS LOG) =================
+
+class TicketStage(models.Model):
+    ticket = models.ForeignKey(
+        Ticket,
+        related_name='stages',
+        on_delete=models.CASCADE
+    )
+    title = models.CharField(max_length=150, blank=True)
+    description = models.TextField()
+
+    added_by = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['created_at']
+
+    def __str__(self):
+        return f"Stage for Ticket #{self.ticket_id} - {self.title or self.description[:30]}"

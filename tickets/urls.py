@@ -15,6 +15,7 @@ urlpatterns = [
     path('login/', views.login_view, name='login'),
     path('logout/', views.logout_view, name='logout'),
     path('admin/close/<int:ticket_id>/', views.admin_close_ticket, name='admin_close_ticket'),
+    path('admin/add-stage/<int:ticket_id>/', views.admin_add_stage, name='admin_add_stage'),
 
     path('final-close/<int:ticket_id>/', views.final_close_ticket, name='final_close_ticket'),
     path('history/', views.ticket_history, name='ticket_history'),

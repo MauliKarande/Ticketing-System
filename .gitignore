@@ -15,3 +15,6 @@ db.sqlite3
 
 # Env
 .env
+
+# Runtime logs
+logs/

@@ -3,23 +3,66 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login, logout
 from django.utils import timezone
 
-from .models import Ticket
-from .forms import TicketCreateForm
+from .models import Ticket, TicketStage
+from .forms import TicketCreateForm, TicketStageForm
 
 
 # ================= ADMIN ACTIONS =================
+
+ADMIN_TABS = {
+    'pending': 'NEW',
+    'in_progress': 'IN_PROGRESS',
+    'admin_closed': 'ADMIN_CLOSED',
+    'closed': 'FINAL_CLOSED',
+}
+
 
 @login_required
 def admin_dashboard(request):
     if request.user.role != 'ADMIN':
         return redirect('/')
 
-    # Admin sees all active tickets (until FINAL_CLOSED)
-    tickets = Ticket.objects.exclude(status='FINAL_CLOSED').order_by('-created_at')
+    active_tab = request.GET.get('tab', 'pending')
+    if active_tab not in ADMIN_TABS:
+        active_tab = 'pending'
+
+    all_tickets = Ticket.objects.all()
+
+    counts = {
+        tab: all_tickets.filter(status=status).count()
+        for tab, status in ADMIN_TABS.items()
+    }
+
+    tickets = all_tickets.filter(
+        status=ADMIN_TABS[active_tab]
+    ).order_by('-created_at')
 
     return render(request, 'admin_dashboard.html', {
-        'tickets': tickets
+        'tickets': tickets,
+        'active_tab': active_tab,
+        'counts': counts,
     })
+
+
+@login_required
+def admin_add_stage(request, ticket_id):
+    ticket = get_object_or_404(Ticket, id=ticket_id)
+
+    if request.user.role != 'ADMIN':
+        return redirect('/')
+
+    if ticket.status != 'IN_PROGRESS':
+        return redirect(f'/tickets/details/{ticket.id}/')
+
+    if request.method == 'POST':
+        form = TicketStageForm(request.POST)
+        if form.is_valid():
+            stage = form.save(commit=False)
+            stage.ticket = ticket
+            stage.added_by = request.user
+            stage.save()
+
+    return redirect(f'/tickets/details/{ticket.id}/')
 
 
 @login_required
