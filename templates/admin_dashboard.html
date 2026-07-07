@@ -250,7 +250,7 @@
                 <td>#{{ ticket.id }}</td>
                 <td>{{ ticket.title }}</td>
                 <td><span class="issue-badge">{{ ticket.get_issue_type_display }}</span></td>
-                <td>{{ ticket.raised_by.username }}</td>
+                <td>{{ ticket.raised_by.get_full_name|default:ticket.raised_by.username }}</td>
                 <td>{{ ticket.department|default:"—" }}</td>
                 <td>
                     <span class="status-badge status-{{ ticket.status|lower }}">
