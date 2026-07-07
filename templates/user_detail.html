@@ -1,0 +1,208 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<style>
+    .back-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 13.5px;
+        color: var(--primary);
+        margin-bottom: 16px;
+    }
+    .back-link:hover { text-decoration: underline; }
+
+    .page-title {
+        font-size: 24px;
+        font-weight: 700;
+        color: var(--primary);
+        margin: 0 0 4px 0;
+    }
+
+    .ticket-id-tag { color: var(--text-muted); font-weight: 600; font-size: 14px; }
+
+    .card {
+        background: var(--surface);
+        border-radius: var(--radius-lg);
+        padding: 24px;
+        margin-bottom: 22px;
+        max-width: 640px;
+        box-shadow: var(--shadow-card);
+    }
+
+    .card h3 {
+        margin: 0 0 16px 0;
+        color: var(--primary);
+        font-size: 17px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .card h3 .icon { width: 18px; height: 18px; }
+
+    .info-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 14px 24px;
+    }
+    .info-item label {
+        display: block;
+        font-size: 11.5px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: var(--text-muted);
+        margin-bottom: 4px;
+    }
+    .info-item div.value { font-size: 14.5px; color: var(--text); }
+
+    .form-group { margin-bottom: 16px; }
+    .form-group label {
+        display: block;
+        font-size: 14px;
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 6px;
+    }
+    .form-group input,
+    .form-group select {
+        width: 100%;
+        padding: 10px 12px;
+        border-radius: var(--radius-sm);
+        border: 1px solid #ccc;
+        font-size: 14px;
+        font-family: inherit;
+        outline: none;
+    }
+    .form-group input:focus,
+    .form-group select:focus {
+        border-color: var(--primary);
+        box-shadow: 0 0 6px rgba(20, 50, 92, 0.3);
+    }
+
+    .checkbox-row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 16px;
+    }
+    .checkbox-row input { width: auto; }
+    .checkbox-row label { margin: 0; font-size: 14px; font-weight: 600; color: #333; }
+
+    .field-error { color: var(--bad-fg); font-size: 12.5px; margin-top: 4px; }
+
+    .action-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 10px 18px;
+        border-radius: var(--radius-md);
+        border: none;
+        cursor: pointer;
+        font-weight: 700;
+        font-size: 13.5px;
+        transition: all 0.18s ease;
+        background: var(--gradient);
+        color: #fff;
+    }
+    .action-btn:hover { transform: translateY(-1px); }
+
+    .self-warning {
+        background: var(--warn-bg);
+        color: var(--warn-fg);
+        padding: 10px 14px;
+        border-radius: var(--radius-sm);
+        font-size: 13px;
+        margin-bottom: 16px;
+    }
+</style>
+
+<a href="{% url 'user_management' %}" class="back-link">
+    {% include "partials/icon.html" with name="home" %} Back to User Management
+</a>
+
+<h2 class="page-title">{{ user_obj.username }}</h2>
+<span class="ticket-id-tag">{{ user_obj.get_role_display }}{% if user_obj.department %} · {{ user_obj.department }}{% endif %}</span>
+
+<div class="card" style="margin-top:20px;">
+    <h3>{% include "partials/icon.html" with name="user" %} Account Information</h3>
+    <div class="info-grid">
+        <div class="info-item">
+            <label>Full Name</label>
+            <div class="value">{{ user_obj.first_name }} {{ user_obj.last_name }}</div>
+        </div>
+        <div class="info-item">
+            <label>Email</label>
+            <div class="value">{{ user_obj.email|default:"—" }}</div>
+        </div>
+        <div class="info-item">
+            <label>Date Joined</label>
+            <div class="value">{{ user_obj.date_joined|date:"d M Y" }}</div>
+        </div>
+        <div class="info-item">
+            <label>Last Login</label>
+            <div class="value">{{ user_obj.last_login|date:"d M Y, H:i"|default:"Never" }}</div>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <h3>{% include "partials/icon.html" with name="settings" %} Role &amp; Department</h3>
+
+    {% if user_obj == request.user %}
+        <div class="self-warning">This is your own account — changing your role or disabling it may lock you out.</div>
+    {% endif %}
+
+    <form method="post" action="{% url 'user_update_role' user_obj.id %}">
+        {% csrf_token %}
+
+        <div class="form-group">
+            <label>Role</label>
+            {{ role_form.role }}
+            {% for error in role_form.role.errors %}<div class="field-error">{{ error }}</div>{% endfor %}
+        </div>
+
+        <div class="form-group">
+            <label>Department</label>
+            {{ role_form.department }}
+        </div>
+
+        <div class="checkbox-row">
+            {{ role_form.is_active }}
+            <label>Account Active</label>
+        </div>
+
+        <button type="submit" class="action-btn">
+            {% include "partials/icon.html" with name="check" %} Save Changes
+        </button>
+    </form>
+</div>
+
+<div class="card">
+    <h3>{% include "partials/icon.html" with name="key" %} Reset Password</h3>
+
+    <form method="post" action="{% url 'user_reset_password' user_obj.id %}">
+        {% csrf_token %}
+
+        <div class="form-group">
+            <label>New Password</label>
+            {{ password_form.new_password }}
+            {% for error in password_form.new_password.errors %}<div class="field-error">{{ error }}</div>{% endfor %}
+        </div>
+
+        <div class="form-group">
+            <label>Confirm New Password</label>
+            {{ password_form.confirm_password }}
+            {% for error in password_form.confirm_password.errors %}<div class="field-error">{{ error }}</div>{% endfor %}
+        </div>
+
+        <button type="submit" class="action-btn">
+            {% include "partials/icon.html" with name="key" %} Reset Password
+        </button>
+    </form>
+</div>
+
+{% endblock %}

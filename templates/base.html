@@ -146,6 +146,19 @@
             max-width: 1280px;
             margin: 0 auto;
         }
+
+        /* MESSAGES */
+        .messages { list-style: none; margin: 0 0 18px 0; padding: 0; max-width: 1280px; }
+        .messages li {
+            padding: 12px 16px;
+            border-radius: var(--radius-sm);
+            font-size: 13.5px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        .messages .success { background: var(--ok-bg); color: var(--ok-fg); }
+        .messages .error { background: var(--bad-bg); color: var(--bad-fg); }
+        .messages .info, .messages .warning { background: var(--warn-bg); color: var(--warn-fg); }
     </style>
 </head>
 <body>
@@ -184,6 +197,9 @@
         <a href="/" class="nav-btn">{% include "partials/icon.html" with name="home" %} Dashboard</a>
         <a href="/tickets/raise/" class="nav-btn">{% include "partials/icon.html" with name="plus" %} Raise Ticket</a>
         <a href="{% url 'ticket_history' %}" class="nav-btn">{% include "partials/icon.html" with name="history" %} History</a>
+        {% if request.user.role == 'ADMIN' %}
+        <a href="{% url 'user_management' %}" class="nav-btn">{% include "partials/icon.html" with name="users" %} Manage Users</a>
+        {% endif %}
         <a href="/logout/" class="nav-btn logout-btn">{% include "partials/icon.html" with name="logout" %} Logout</a>
 
     </div>
@@ -192,6 +208,14 @@
 
 <!-- PAGE CONTENT -->
 <div class="page-container">
+    {% if messages %}
+    <ul class="messages">
+        {% for message in messages %}
+        <li class="{{ message.tags }}">{{ message }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+
     {% block content %}
     {% endblock %}
 </div>
